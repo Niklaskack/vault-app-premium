@@ -1,0 +1,3 @@
+This is a placeholder for the TFLite transaction parsing model.
+In a real production environment, you would place 'transaction_parser.tflite' here.
+The NLP service is configured to look for this file.

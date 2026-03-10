@@ -132,7 +132,7 @@ class TransactionsScreen extends ConsumerWidget {
           ),
         ),
         trailing: Text(
-          '${isExpense ? '-' : '+'}${NumberFormat.currency(symbol: r'$').format(tx.amount)}',
+          '${isExpense ? '-' : '+'}${l10n.formatCurrency(tx.amount)}',
           style: TextStyle(
             color: isExpense ? const Color(0xFFF87171) : const Color(0xFF34D399),
             fontWeight: FontWeight.w900,

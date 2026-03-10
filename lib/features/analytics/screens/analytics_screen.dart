@@ -76,7 +76,7 @@ class AnalyticsScreen extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildSpendingList(context, categoryData),
+                    _buildSpendingList(context, l10n, categoryData),
                     const SizedBox(height: 48),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -190,7 +190,7 @@ class AnalyticsScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                NumberFormat.currency(symbol: r'$').format(total),
+                l10n.formatCurrency(total),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 32,
@@ -205,7 +205,7 @@ class AnalyticsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildSpendingList(BuildContext context, Map<TransactionCategory, double> data) {
+  Widget _buildSpendingList(BuildContext context, AppLocalizations l10n, Map<TransactionCategory, double> data) {
     final sortedData = data.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     
     return Container(
@@ -245,7 +245,7 @@ class AnalyticsScreen extends ConsumerWidget {
               ),
             ),
             trailing: Text(
-              NumberFormat.currency(symbol: r'$').format(e.value),
+              l10n.formatCurrency(e.value),
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.w700,
@@ -324,7 +324,7 @@ class AnalyticsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  NumberFormat.currency(symbol: r'$').format(tx.amount),
+                  l10n.formatCurrency(tx.amount),
                   style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 16),
                 ),
                 const SizedBox(height: 4),
@@ -396,7 +396,7 @@ class AnalyticsScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${NumberFormat.currency(symbol: r'$').format(forecast.safeToSpendDaily)} / DAY',
+                      '${l10n.formatCurrency(forecast.safeToSpendDaily)} / DAY',
                       style: const TextStyle(
                         color: Color(0xFF38B6FF),
                         fontSize: 18,

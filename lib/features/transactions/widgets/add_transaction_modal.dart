@@ -9,6 +9,7 @@ import '../../../core/providers/service_providers.dart';
 import '../../../services/ocr_service.dart';
 import '../../../services/voice_service.dart';
 import '../../../services/nlp_service.dart';
+import '../../../core/l10n/app_localizations.dart';
 
 class AddTransactionModal extends ConsumerStatefulWidget {
   const AddTransactionModal({super.key});
@@ -102,6 +103,7 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = ref.watch(l10nProvider);
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -157,10 +159,11 @@ class _AddTransactionModalState extends ConsumerState<AddTransactionModal> {
             const SizedBox(height: 16),
             TextFormField(
               controller: _amountController,
-              decoration: const InputDecoration(
+              decoration: InputDecoration(
                 labelText: 'Amount',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.attach_money),
+                border: const OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.payments_outlined),
+                suffixText: l10n.translate('currency_symbol'),
               ),
               keyboardType: TextInputType.number,
               validator: (val) => val == null || double.tryParse(val) == null ? 'Please enter valid amount' : null,

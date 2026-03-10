@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../providers/settings_provider.dart';
 
 class AppLocalizations {
@@ -57,6 +58,7 @@ class AppLocalizations {
       'analytics_cycle_detected': 'MONTHLY CYCLE DETECTED',
       'analytics_no_cycles': 'No repeating cycles detected yet.',
       'analytics_train_engine': 'Keep using Vault to train the engine.',
+      'currency_symbol': '$',
     },
     'sv': {
       'app_title': 'V A U L T',
@@ -107,11 +109,19 @@ class AppLocalizations {
       'analytics_cycle_detected': 'MÅNATLIG CYKEL IDENTIFIERAD',
       'analytics_no_cycles': 'Inga återkommande cykler identifierade än.',
       'analytics_train_engine': 'Fortsätt använda Vault för att träna motorn.',
+      'currency_symbol': 'kr',
     },
   };
 
   String translate(String key) {
     return _localizedValues[locale.languageCode]?[key] ?? key;
+  }
+
+  String formatCurrency(double amount) {
+    if (locale.languageCode == 'sv') {
+      return '${NumberFormat('#,##0.00', 'sv_SE').format(amount)} kr';
+    }
+    return NumberFormat.currency(symbol: '$').format(amount);
   }
 }
 

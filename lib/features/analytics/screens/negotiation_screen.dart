@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import '../../../domain/models/transaction.dart';
 import '../../../core/providers/service_providers.dart';
 import '../../../core/providers/premium_provider.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../profile/screens/paywall_screen.dart';
 
 class NegotiationScreen extends ConsumerWidget {
@@ -17,6 +18,7 @@ class NegotiationScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final analysis = ref.watch(analysisServiceProvider);
     final isPremium = ref.watch(isPremiumProvider);
+    final l10n = ref.watch(l10nProvider);
     final tips = analysis.getNegotiationTips(transaction.merchant);
 
     return Scaffold(
@@ -85,7 +87,7 @@ class NegotiationScreen extends ConsumerWidget {
                           border: Border.all(color: const Color(0xFFF59E0B).withOpacity(0.2)),
                         ),
                         child: Text(
-                          '${NumberFormat.currency(symbol: r'$').format(transaction.amount)} / MONTH',
+                          '${l10n.formatCurrency(transaction.amount)} / MONTH',
                           style: const TextStyle(
                             color: Color(0xFFF59E0B),
                             fontWeight: FontWeight.w900,

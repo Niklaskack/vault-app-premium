@@ -187,7 +187,7 @@ class DashboardScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                NumberFormat.currency(symbol: r'$').format(balance),
+                l10n.formatCurrency(balance),
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 36,
@@ -314,7 +314,7 @@ class DashboardScreen extends ConsumerWidget {
                ),
              ),
              trailing: Text(
-               '${isExpense ? '-' : '+'}${NumberFormat.currency(symbol: r'$').format(tx.amount)}',
+               '${isExpense ? '-' : '+'}${l10n.formatCurrency(tx.amount)}',
                style: TextStyle(
                  fontWeight: FontWeight.w900,
                  fontSize: 15,

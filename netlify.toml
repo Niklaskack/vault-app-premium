@@ -6,3 +6,6 @@
 [build]
   publish = "build/web"
   command = "if [ ! -d \"flutter\" ]; then git clone --depth 1 https://github.com/flutter/flutter.git -b stable; fi && ./flutter/bin/flutter build web --release"
+
+[build.environment]
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"

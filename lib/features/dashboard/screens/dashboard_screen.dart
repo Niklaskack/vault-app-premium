@@ -19,24 +19,85 @@ class DashboardScreen extends ConsumerWidget {
     final transactionsAsync = ref.watch(transactionsProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFF030712), // Cosmic Black
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Vault Dashboard', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: const Text(
+          'V A U L T',
+          style: TextStyle(
+            fontWeight: FontWeight.w900,
+            letterSpacing: 4.0,
+            fontSize: 16,
+          ),
+        ),
+        centerTitle: true,
         actions: [
-          IconButton(icon: const Icon(Icons.notifications_none), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white70),
+            onPressed: () {},
+          ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async => ref.refresh(transactionsProvider),
-        child: transactionsAsync.when(
-          data: (transactions) => _buildContent(context, ref, transactions),
-          loading: () => const Center(child: CircularProgressIndicator()),
-          error: (err, stack) => Center(child: Text('Error: $err')),
-        ),
+      body: Stack(
+        children: [
+          // Atmospheric Background Glows
+          _buildBackgroundGlows(context),
+          
+          RefreshIndicator(
+            onRefresh: () async => ref.refresh(transactionsProvider),
+            displacement: 100,
+            child: transactionsAsync.when(
+              data: (transactions) => _buildContent(context, ref, transactions),
+              loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF38B6FF))),
+              error: (err, stack) => Center(child: Text('Sync Error: $err', style: const TextStyle(color: Colors.redAccent))),
+            ),
+          ),
+        ],
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddTransactionModal(context),
-        child: const Icon(Icons.add),
-      ).animate().fadeIn(duration: 400.ms).move(begin: const Offset(0, 10), end: Offset.zero, curve: Curves.easeOutBack),
+        backgroundColor: const Color(0xFF2563EB),
+        elevation: 12,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add_rounded, size: 30, color: Colors.white),
+      ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.8, 0.8), end: Offset.one, curve: Curves.easeOutBack),
+    );
+  }
+
+  Widget _buildBackgroundGlows(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned(
+          top: -100,
+          left: -50,
+          child: Container(
+            width: 300,
+            height: 300,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [const Color(0xFF1E40AF).withOpacity(0.2), Colors.transparent],
+              ),
+            ),
+          ),
+        ),
+        Positioned(
+          bottom: 100,
+          right: -100,
+          child: Container(
+            width: 400,
+            height: 400,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: RadialGradient(
+                colors: [const Color(0xFF38B6FF).withOpacity(0.15), Colors.transparent],
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -47,49 +108,34 @@ class DashboardScreen extends ConsumerWidget {
 
     return SingleChildScrollView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 70,
+        left: 20,
+        right: 20,
+        bottom: 100,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildBalanceCard(context, balance),
-          const SizedBox(height: 16),
-          _buildBankSyncCard(context, ref),
-          const SizedBox(height: 16),
-          _buildSmsSyncCard(context, ref),
           const SizedBox(height: 24),
-          Text('Recent Transactions', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
+          _buildQuickActionsRow(context, ref),
+          const SizedBox(height: 32),
+          Text(
+            'LATEST ACTIVITY',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w900,
+              color: Colors.white.withOpacity(0.4),
+              letterSpacing: 2.0,
+            ),
+          ),
+          const SizedBox(height: 16),
           if (transactions.isEmpty)
             _buildEmptyState(context)
           else
-            ListView.separated(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: transactions.length > 5 ? 5 : transactions.length,
-              separatorBuilder: (_, __) => const Divider(),
-              itemBuilder: (context, index) {
-                final tx = transactions[index];
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: tx.type == TransactionType.income ? Colors.green.shade100 : Colors.red.shade100,
-                    child: Icon(
-                      tx.type == TransactionType.income ? Icons.arrow_upward : Icons.arrow_downward,
-                      color: tx.type == TransactionType.income ? Colors.green : Colors.red,
-                    ),
-                  ),
-                  title: Text(tx.merchant, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(DateFormat('MMM dd, yyyy').format(tx.date)),
-                  trailing: Text(
-                    '${tx.type == TransactionType.expense ? '-' : '+'}${NumberFormat.currency(symbol: r'$').format(tx.amount)}',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: tx.type == TransactionType.income ? Colors.green : Colors.red,
-                    ),
-                  ),
-                );
-              },
-            ),
-          const SizedBox(height: 24),
+            _buildTransactionList(context, transactions),
+          const SizedBox(height: 32),
           _buildInsightsSection(context, ref, transactions),
         ],
       ),
@@ -99,43 +145,175 @@ class DashboardScreen extends ConsumerWidget {
   Widget _buildBalanceCard(BuildContext context, double balance) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(28),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Theme.of(context).primaryColor, Theme.of(context).primaryColor.withOpacity(0.8)],
+        borderRadius: BorderRadius.circular(32),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF1E3A8A), Color(0xFF0F172A)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: const Color(0xFF1E3A8A).withOpacity(0.4),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
           ),
         ],
+        border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+      ),
+      child: Stack(
+        children: [
+          // Cyber Patterns (simplified)
+          Positioned(
+            right: -20,
+            top: -20,
+            child: Icon(Icons.security_rounded, size: 100, color: Colors.white.withOpacity(0.03)),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'ENCRYPTED BALANCE',
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 2.0,
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                NumberFormat.currency(symbol: r'$').format(balance),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: -1.0,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF38B6FF).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFF38B6FF).withOpacity(0.2)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.wifi_off_rounded, color: Color(0xFF38B6FF), size: 14),
+                    const SizedBox(width: 8),
+                    Text(
+                      'LOCAL NODE ACTIVE',
+                      style: TextStyle(
+                        color: const Color(0xFF38B6FF).withOpacity(0.8),
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.1, end: 0);
+  }
+
+  Widget _buildQuickActionsRow(BuildContext context, WidgetRef ref) {
+    return Row(
+      children: [
+        Expanded(child: _buildSmallActionCard(context, ref, 'BANK SYNC', Icons.account_balance_rounded, true)),
+        const SizedBox(width: 16),
+        Expanded(child: _buildSmallActionCard(context, ref, 'SMS PARSE', Icons.sms_rounded, false)),
+      ],
+    );
+  }
+
+  Widget _buildSmallActionCard(BuildContext context, WidgetRef ref, String label, IconData icon, bool primary) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Total Balance', style: TextStyle(color: Colors.white70, fontSize: 16)),
-          const SizedBox(height: 8),
+          Icon(icon, color: primary ? const Color(0xFF38B6FF) : Colors.greenAccent, size: 24),
+          const SizedBox(height: 14),
           Text(
-            NumberFormat.currency(symbol: r'$').format(balance),
-            style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              const Icon(Icons.security, color: Colors.white70, size: 16),
-              const SizedBox(width: 8),
-              Text('Encrypted & Offline', style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
-            ],
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w900,
+              color: Colors.white38,
+              letterSpacing: 1.0,
+            ),
           ),
         ],
-      ).animate().fadeIn(duration: 600.ms).move(begin: const Offset(0, 20), end: Offset.zero),
+      ),
     );
   }
+
+  Widget _buildTransactionList(BuildContext context, List<Transaction> transactions) {
+     return Container(
+       decoration: BoxDecoration(
+         color: Colors.white.withOpacity(0.03),
+         borderRadius: BorderRadius.circular(24),
+         border: Border.all(color: Colors.white.withOpacity(0.05)),
+       ),
+       child: ListView.separated(
+         shrinkWrap: true,
+         physics: const NeverScrollableScrollPhysics(),
+         padding: const EdgeInsets.all(12),
+         itemCount: transactions.length > 5 ? 5 : transactions.length,
+         separatorBuilder: (_, __) => Divider(color: Colors.white.withOpacity(0.05)),
+         itemBuilder: (context, index) {
+           final tx = transactions[index];
+           final isExpense = tx.type == TransactionType.expense;
+           return ListTile(
+             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+             leading: Container(
+               width: 44,
+               height: 44,
+               decoration: BoxDecoration(
+                 color: isExpense ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1),
+                 borderRadius: BorderRadius.circular(14),
+               ),
+               child: Icon(
+                 isExpense ? Icons.arrow_downward_rounded : Icons.arrow_upward_rounded,
+                 color: isExpense ? Colors.redAccent : Colors.greenAccent,
+                 size: 18,
+               ),
+             ),
+             title: Text(
+               tx.merchant,
+               style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 14),
+             ),
+             subtitle: Text(
+               DateFormat('MMM dd').format(tx.date),
+               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+             ),
+             trailing: Text(
+               '${isExpense ? '-' : '+'}${NumberFormat.currency(symbol: r'$').format(tx.amount)}',
+               style: TextStyle(
+                 fontWeight: FontWeight.w900,
+                 fontSize: 15,
+                 color: isExpense ? Colors.white : Colors.greenAccent,
+               ),
+             ),
+           );
+         },
+       ),
+     );
+  }
+
 
   Widget _buildEmptyState(BuildContext context) {
     return Center(

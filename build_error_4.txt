@@ -1,6 +1,0 @@
-Building Windows application...                                 
-Nuget.exe not found, trying to download or use cached version.
-Nuget.exe not found, trying to download or use cached version.
-C:\Users\stone\.gemini\antigravity\scratch\vault_app\windows\flutter\generated_plugin_registrant.cc(24,3): error C3861: 'SpeechToTextWindowsRegisterWithRegistrar': identifier not found [C:\Users\stone\.gemini\antigravity\scratch\vault_app\build\windows\x64\runner\vault.vcxproj]
-Building Windows application...                                    19,2s
-Build process failed.

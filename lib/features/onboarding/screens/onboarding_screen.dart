@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../main_navigation.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -9,47 +10,63 @@ class OnboardingScreen extends StatefulWidget {
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
+class _OnboardingScreenState extends State<OnboardingScreen> with TickerProviderStateMixin {
   final PageController _controller = PageController();
+  double _scrollOffset = 0;
   int _currentPage = 0;
 
   final List<OnboardingData> _data = [
     OnboardingData(
-      title: 'Trust-First Finance',
-      description: 'Vault keeps your financial life entirely\nprivate. All your data is encrypted,\nstored only on your device, and never\nin the cloud. Total privacy,\nabsolute security.',
+      title: 'TRUST-FIRST FINANCE',
+      subtitle: 'ABSOLUTE PRIVACY',
+      description: 'Vault keeps your financial life entirely private. All your data is encrypted and stored locally. Never in the cloud.',
       assetPath: 'assets/images/onboarding_shield.png',
     ),
     OnboardingData(
-      title: 'Auto Transaction Sync',
-      description: 'We securely parse your bank SMS\nand notifications using on-device AI\nto track your spending automatically.',
+      title: 'AUTO NODE SYNC',
+      subtitle: 'ON-DEVICE NLP',
+      description: 'Our local AI engine securely parses your bank notifications to track spending instantly and automatically.',
       assetPath: 'assets/images/onboarding_sync.png',
     ),
     OnboardingData(
-      title: 'Proactive Intelligence',
-      description: 'Get nudges on spending habits\nand fraud alerts long before\nthey become a problem.',
+      title: 'PROACTIVE ALERTS',
+      subtitle: 'FRAUD DETECTION',
+      description: 'Get immediate nudges on spending habits and anomaly alerts before they become a risk.',
       assetPath: 'assets/images/onboarding_intel.png',
     ),
     OnboardingData(
-      title: 'Full Control',
-      description: 'You dictate who, what, and where\nyour money goes. Say goodbye to\nhidden fees and surprises.',
+      title: 'TOTAL CONTROL',
+      subtitle: 'LOCAL STORAGE',
+      description: 'You dictate who, what, and where your money goes. Radical transparency in every byte.',
       assetPath: 'assets/images/onboarding_control.png',
     ),
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() {
+      setState(() {
+        _scrollOffset = _controller.page ?? 0;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF030712), // Deeper cosmic black
+      backgroundColor: const Color(0xFF020617), // Deepest Obsidian
       body: Stack(
         children: [
-          // 1. Premium Background Layer
-          _buildBackgroundLayers(context),
+          // 1. Cosmic Abyss: Multi-layered animated background
+          _buildCosmicAbyss(),
           
           SafeArea(
             child: Column(
               children: [
-                // 2. High-End Branding
-                _buildHeader(),
+                const SizedBox(height: 20),
+                // 2. Elite Branding
+                _buildEliteHeader(),
                 
                 // 3. Immersive Content Slider
                 Expanded(
@@ -57,12 +74,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     controller: _controller,
                     onPageChanged: (idx) => setState(() => _currentPage = idx),
                     itemCount: _data.length,
-                    itemBuilder: (context, idx) => _buildPage(_data[idx]),
+                    itemBuilder: (context, idx) => _buildPage(idx),
                   ),
                 ),
                 
-                // 4. Strategic Call to Action
-                _buildBottomControls(),
+                // 4. Liquid Controls
+                _buildLiquidControls(),
               ],
             ),
           ),
@@ -71,221 +88,264 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  Widget _buildBackgroundLayers(BuildContext context) {
+  Widget _buildCosmicAbyss() {
     return Stack(
       children: [
-        // Top-Right Cyber Glow
-        Positioned(
-          top: -150,
-          right: -100,
+        // Constant Deep Bloom
+        Positioned.fill(
           child: Container(
-            width: 400,
-            height: 400,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
+            decoration: const BoxDecoration(
               gradient: RadialGradient(
-                colors: [
-                  const Color(0xFF1E40AF).withOpacity(0.4),
-                  const Color(0xFF1E40AF).withOpacity(0.0),
-                ],
-              ),
-            ),
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).moveY(begin: -20, end: 20, duration: 3.seconds),
-        ),
-        
-        // Bottom-Left Deep Shadow
-        Positioned(
-          bottom: -200,
-          left: -150,
-          child: Container(
-            width: 500,
-            height: 500,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  const Color(0xFF0F172A).withOpacity(0.6),
-                  Colors.transparent,
-                ],
+                center: Alignment.center,
+                radius: 1.5,
+                colors: [Color(0xFF0F172A), Color(0xFF020617)],
               ),
             ),
           ),
         ),
+        
+        // Dynamic Halo Bloom (Parallax)
+        Positioned(
+          left: -150 - (_scrollOffset * 40),
+          top: 100,
+          child: _buildGlowOrb(450, const Color(0xFF1E40AF).withOpacity(0.15)),
+        ),
+        
+        Positioned(
+          right: -100 + (_scrollOffset * 30),
+          bottom: 100,
+          child: _buildGlowOrb(400, const Color(0xFF38B6FF).withOpacity(0.1)),
+        ),
+
+        // Animated "Light Rays" or Particles
+        ...List.generate(3, (i) => Positioned(
+          top: 100.0 * i,
+          left: -50.0 + (i * 100),
+          child: Opacity(
+            opacity: 0.05,
+            child: Container(
+              width: 2,
+              height: 400,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Colors.transparent, Colors.white, Colors.transparent],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+              ),
+            ),
+          ).animate(onPlay: (c) => c.repeat()).moveY(begin: -50, end: 300, duration: (5 + i).seconds),
+        )),
       ],
     );
   }
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SizedBox(
-            width: 40,
-            height: 40,
-            child: CustomPaint(
-              painter: VaultLogoPainter(),
-            ),
+  Widget _buildGlowOrb(double size, Color color) {
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: RadialGradient(colors: [color, Colors.transparent]),
+      ),
+    ).animate(onPlay: (c) => c.repeat(reverse: true))
+     .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 4.seconds, curve: Curves.easeInOut);
+  }
+
+  Widget _buildEliteHeader() {
+    return Column(
+      children: [
+        SizedBox(
+          width: 44,
+          height: 44,
+          child: CustomPaint(painter: VaultLogoPainter(glowColor: const Color(0xFF38B6FF))),
+        ).animate().scale(delay: 200.ms, duration: 600.ms, curve: Curves.easeOutBack),
+        const SizedBox(height: 12),
+        Text(
+          'V A U L T',
+          style: GoogleFonts.montserrat(
+            fontSize: 14,
+            color: Colors.white,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 10.0,
           ),
-          const SizedBox(width: 14),
-          const Text(
-            'V A U L T',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.white,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 6.0,
-            ),
-          ),
-        ],
-      ).animate().fadeIn(duration: 800.ms).slideY(begin: -0.2, end: 0),
+        ).animate().fadeIn(delay: 400.ms).shimmer(duration: 1.seconds),
+      ],
     );
   }
 
-  Widget _buildBottomControls() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 48),
+  Widget _buildPage(int index) {
+    final info = _data[index];
+    // Simple parallax effect calculations
+    double relativeScroll = index - _scrollOffset;
+    double opacity = (1 - relativeScroll.abs()).clamp(0.0, 1.0);
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 40),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Minimalist Indicator
+          // Glassmorphic Icon Halo
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Container(
+                width: 240,
+                height: 240,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.03),
+                  border: Border.all(color: Colors.white.withOpacity(0.08)),
+                ),
+              ).animate(onPlay: (c) => c.repeat(reverse: true))
+               .scale(begin: const Offset(0.95, 0.95), end: const Offset(1.05, 1.05), duration: 3.seconds),
+              
+              Opacity(
+                opacity: opacity,
+                child: Transform.translate(
+                  offset: Offset(relativeScroll * 100, 0),
+                  child: Image.asset(info.assetPath, width: 200, height: 200),
+                ),
+              ),
+            ],
+          ),
+          
+          const SizedBox(height: 60),
+          
+          Opacity(
+            opacity: opacity,
+            child: Column(
+              children: [
+                Text(
+                  info.subtitle,
+                  style: GoogleFonts.montserrat(
+                    color: const Color(0xFF38B6FF),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 4.0,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  info.title,
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.montserrat(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.white,
+                    letterSpacing: -0.5,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Text(
+                    info.description,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      color: Colors.white.withOpacity(0.4),
+                      height: 1.7,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLiquidControls() {
+    return Padding(
+      padding: const EdgeInsets.all(40.0),
+      child: Column(
+        children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(_data.length, (idx) => _buildDot(idx)),
+            children: List.generate(_data.length, (idx) {
+              bool active = _currentPage == idx;
+              return AnimatedContainer(
+                duration: 400.ms,
+                width: active ? 24 : 6,
+                height: 6,
+                margin: const EdgeInsets.symmetric(horizontal: 4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(3),
+                  color: active ? const Color(0xFF38B6FF) : Colors.white.withOpacity(0.1),
+                ),
+              );
+            }),
           ),
           const SizedBox(height: 48),
           
-          // Elevated Glass Action Button
           GestureDetector(
             onTap: () {
               if (_currentPage == _data.length - 1) {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainNavigation()));
               } else {
-                _controller.nextPage(duration: 500.ms, curve: Curves.easeOutQuart);
+                _controller.nextPage(duration: 800.ms, curve: Curves.easeInOutQuart);
               }
             },
             child: Container(
               width: double.infinity,
               height: 64,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(32),
+                borderRadius: BorderRadius.circular(20),
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF2563EB), Color(0xFF1D4ED8)],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                  colors: [Color(0xFF1E40AF), Color(0xFF38B6FF)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF2563EB).withOpacity(0.4),
-                    blurRadius: 24,
-                    offset: const Offset(0, 12),
+                    color: const Color(0xFF38B6FF).withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    top: 2,
-                    left: 20,
-                    right: 20,
-                    child: Container(
-                      height: 1,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: [Colors.white.withOpacity(0.0), Colors.white.withOpacity(0.3), Colors.white.withOpacity(0.0)],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Center(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          _currentPage == _data.length - 1 ? 'BEGIN JOURNEY' : 'CONTINUE',
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.white,
-                            letterSpacing: 2.0,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(20),
+                child: Stack(
+                  children: [
+                    // Moving Shimmer Overlay
+                    Positioned.fill(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Colors.white.withOpacity(0.0), Colors.white.withOpacity(0.15), Colors.white.withOpacity(0.0)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.chevron_right_rounded, color: Colors.white, size: 24),
-                      ],
+                      ).animate(onPlay: (c) => c.repeat()).move(begin: const Offset(-200, -200), end: const Offset(400, 400), duration: 3.seconds),
                     ),
-                  ),
-                ],
+                    Center(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            _currentPage == _data.length - 1 ? 'GO TO VAULT' : 'NEXT PHASE',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.white,
+                              letterSpacing: 2.0,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white, size: 16),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(begin: const Offset(1,1), end: const Offset(1.02, 1.02), duration: 2.seconds, curve: Curves.easeInOut),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _buildDot(int index) {
-    bool isActive = _currentPage == index;
-    return AnimatedContainer(
-      duration: 300.ms,
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      height: 6,
-      width: isActive ? 32 : 6,
-      decoration: BoxDecoration(
-        color: isActive ? Colors.white : const Color(0xFF384561),
-        borderRadius: BorderRadius.circular(3),
-      ),
-    );
-  }
-
-  Widget _buildPage(OnboardingData info) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 32),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // 3D Generated High-Quality Icon
-          SizedBox(
-            width: 250,
-            height: 250,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(125), // Optional clipping if generated image has corners
-              child: Image.asset(
-                info.assetPath,
-                fit: BoxFit.cover,
-              ),
-            ),
-          ).animate(onPlay: (controller) => controller.repeat(reverse: true))
-           .moveY(begin: -5, end: 5, duration: 2.seconds, curve: Curves.easeInOutSine)
-           .fadeIn(duration: 600.ms),
-          
-          const SizedBox(height: 54),
-          
-          Text(
-            info.title,
-            style: const TextStyle(
-              fontSize: 27, 
-              fontWeight: FontWeight.w800, 
-              color: Colors.white,
-              letterSpacing: 0.5,
-            ),
-            textAlign: TextAlign.center,
-          ).animate().fadeIn(delay: 300.ms).move(begin: const Offset(0, 20), end: Offset.zero),
-          
-          const SizedBox(height: 18),
-          
-          Text(
-            info.description,
-            style: const TextStyle(
-              fontSize: 14, 
-              color: Color(0xFF94A3B8), // slateish grey
-              height: 1.6,
-              fontWeight: FontWeight.w400,
-            ),
-            textAlign: TextAlign.center,
-          ).animate().fadeIn(delay: 500.ms).move(begin: const Offset(0, 20), end: Offset.zero),
+          ),
         ],
       ),
     );
@@ -294,70 +354,62 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
 class OnboardingData {
   final String title;
+  final String subtitle;
   final String description;
   final String assetPath;
   OnboardingData({
-    required this.title, 
-    required this.description, 
+    required this.title,
+    required this.subtitle,
+    required this.description,
     required this.assetPath,
   });
 }
 
-// Custom Painter to draw the V + internal lock Vault Logo accurately
 class VaultLogoPainter extends CustomPainter {
+  final Color glowColor;
+  VaultLogoPainter({required this.glowColor});
+
   @override
   void paint(Canvas canvas, Size size) {
-    // V geometry
     final paintV = Paint()
-      ..shader = const LinearGradient(
-        colors: [Color(0xFF639CFA), Color(0xFF2C5FA7)],
+      ..shader = LinearGradient(
+        colors: [glowColor, glowColor.withOpacity(0.4)],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))
       ..style = PaintingStyle.fill;
 
     final pathV = Path();
-    pathV.moveTo(0, 0);
-    pathV.lineTo(size.width * 0.35, 0);
-    pathV.lineTo(size.width * 0.5, size.height * 0.8);
-    pathV.lineTo(size.width * 0.65, 0);
-    pathV.lineTo(size.width, 0);
+    pathV.moveTo(0, size.height * 0.1);
+    pathV.lineTo(size.width * 0.2, size.height * 0.1);
+    pathV.lineTo(size.width * 0.5, size.height * 0.9);
+    pathV.lineTo(size.width * 0.8, size.height * 0.1);
+    pathV.lineTo(size.width, size.height * 0.1);
     pathV.lineTo(size.width * 0.5, size.height);
     pathV.close();
 
     canvas.drawPath(pathV, paintV);
 
-    // Lock body
-    final paintLockBody = Paint()
-      ..color = const Color(0xFF00E5FF)
-      ..style = PaintingStyle.fill;
-
-    final lockRect = Rect.fromLTWH(size.width * 0.35, size.height * 0.55, size.width * 0.3, size.height * 0.35);
-    canvas.drawRRect(RRect.fromRectAndRadius(lockRect, const Radius.circular(3)), paintLockBody);
-
-    // Lock shackle
-    final paintLockShackle = Paint()
-      ..color = const Color(0xFF00E5FF)
+    final paintLock = Paint()
+      ..color = glowColor
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round;
 
-    canvas.drawArc(
-      Rect.fromLTWH(size.width * 0.4, size.height * 0.4, size.width * 0.2, size.height * 0.3),
-      3.14159,
-      3.14159,
-      false,
-      paintLockShackle,
+    final lockRect = Rect.fromCenter(
+      center: Offset(size.width * 0.5, size.height * 0.35),
+      width: size.width * 0.25,
+      height: size.height * 0.2,
     );
+    canvas.drawRRect(RRect.fromRectAndRadius(lockRect, const Radius.circular(3)), paintLock);
     
-    // Keyhole
-    final paintKeyhole = Paint()
-      ..color = const Color(0xFF08122D)
-      ..style = PaintingStyle.fill;
-    
-    canvas.drawCircle(Offset(size.width * 0.5, size.height * 0.68), 2, paintKeyhole);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.48, size.height * 0.68, size.width * 0.04, size.height * 0.1), paintKeyhole);
+    canvas.drawArc(
+      Rect.fromCenter(center: Offset(size.width * 0.5, size.height * 0.25), width: size.width * 0.15, height: size.height * 0.15),
+      3.14, 3.14, false, paintLock
+    );
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+

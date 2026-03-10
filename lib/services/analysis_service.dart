@@ -33,13 +33,52 @@ class AnalysisService {
   }
 
   double forecastNextMonth(List<Transaction> history) {
-    if (history.length < 30) return 0.0; // Need more data
+    return generateForecast(history).projectedTotal;
+  }
+
+  ForecastData generateForecast(List<Transaction> history) {
+    if (history.isEmpty) return ForecastData.empty();
+
+    final now = DateTime.now();
+    final endOfMonth = DateTime(now.year, now.month + 1, 0);
+    final daysRemaining = endOfMonth.difference(now).inDays;
+
+    // 1. Identify Fixed Recurring Costs
+    final recurring = identifyRecurring(history);
+    final totalRecurring = recurring.fold(0.0, (sum, tx) => sum + tx.amount);
+
+    // 2. Identify Variable Daily Spending (moving average of last 14 days)
+    final twoWeeksAgo = now.subtract(const Duration(days: 14));
+    final variableExpenses = history.where((t) {
+      return t.type == TransactionType.expense && 
+             t.date.isAfter(twoWeeksAgo) &&
+             !recurring.any((r) => r.merchant == t.merchant);
+    }).toList();
+
+    double avgDailyVariable = 0;
+    if (variableExpenses.isNotEmpty) {
+      avgDailyVariable = variableExpenses.fold(0.0, (sum, tx) => sum + tx.amount) / 14;
+    }
+
+    // 3. Generate Projection Points (Next 30 Days)
+    final List<double> projectionPoints = [];
+    double currentHypotheticalBalance = 0; // Starting from relative zero for the chart
     
-    // Simple average of past 3 months
-    final expenses = history.where((t) => t.type == TransactionType.expense).map((t) => t.amount).toList();
-    if (expenses.isEmpty) return 0.0;
-    
-    return expenses.reduce((a, b) => a + b) / (history.last.date.difference(history.first.date).inDays / 30);
+    for (int i = 0; i < 30; i++) {
+      currentHypotheticalBalance -= avgDailyVariable;
+      // Add recurring if it falls on this day (simplified)
+      if (i % 30 == 0) currentHypotheticalBalance -= totalRecurring; 
+      projectionPoints.add(currentHypotheticalBalance);
+    }
+
+    final projectedTotal = totalRecurring + (avgDailyVariable * 30);
+    final safeToSpend = avgDailyVariable > 0 ? avgDailyVariable : 50.0; // Fallback to $50
+
+    return ForecastData(
+      projectedTotal: projectedTotal,
+      safeToSpendDaily: safeToSpend,
+      projectionPoints: projectionPoints,
+    );
   }
 
   List<Transaction> identifyRecurring(List<Transaction> history) {
@@ -115,4 +154,22 @@ class ActionableInsight {
     required this.type,
     required this.actionLabel,
   });
+}
+
+class ForecastData {
+  final double projectedTotal;
+  final double safeToSpendDaily;
+  final List<double> projectionPoints;
+
+  ForecastData({
+    required this.projectedTotal,
+    required this.safeToSpendDaily,
+    required this.projectionPoints,
+  });
+
+  factory ForecastData.empty() => ForecastData(
+    projectedTotal: 0,
+    safeToSpendDaily: 0,
+    projectionPoints: [],
+  );
 }

@@ -10,6 +10,8 @@ import '../../../core/providers/service_providers.dart';
 import '../../../services/bank_sync_service.dart';
 import '../../../core/providers/premium_provider.dart';
 import '../../profile/screens/paywall_screen.dart';
+import '../../../core/providers/navigation_provider.dart';
+import '../../../core/l10n/app_localizations.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -17,6 +19,7 @@ class DashboardScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final transactionsAsync = ref.watch(transactionsProvider);
+    final l10n = ref.watch(l10nProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFF030712), // Cosmic Black
@@ -24,9 +27,9 @@ class DashboardScreen extends ConsumerWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: const Text(
-          'V A U L T',
-          style: TextStyle(
+        title: Text(
+          l10n.translate('app_title'),
+          style: const TextStyle(
             fontWeight: FontWeight.w900,
             letterSpacing: 4.0,
             fontSize: 16,
@@ -49,9 +52,9 @@ class DashboardScreen extends ConsumerWidget {
             onRefresh: () async => ref.refresh(transactionsProvider),
             displacement: 100,
             child: transactionsAsync.when(
-              data: (transactions) => _buildContent(context, ref, transactions),
+              data: (transactions) => _buildContent(context, ref, l10n, transactions),
               loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFF38B6FF))),
-              error: (err, stack) => Center(child: Text('Sync Error: $err', style: const TextStyle(color: Colors.redAccent))),
+              error: (err, stack) => Center(child: Text('${l10n.translate('dash_sync_error')}: $err', style: const TextStyle(color: Colors.redAccent))),
             ),
           ),
         ],
@@ -62,7 +65,7 @@ class DashboardScreen extends ConsumerWidget {
         elevation: 12,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add_rounded, size: 30, color: Colors.white),
-      ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.8, 0.8), end: Offset.one, curve: Curves.easeOutBack),
+      ).animate().fadeIn(duration: 400.ms).scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1), curve: Curves.easeOutBack),
     );
   }
 
@@ -101,7 +104,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, List<Transaction> transactions) {
+  Widget _buildContent(BuildContext context, WidgetRef ref, AppLocalizations l10n, List<Transaction> transactions) {
     final totalSpent = transactions.where((t) => t.type == TransactionType.expense).fold(0.0, (sum, item) => sum + item.amount);
     final totalIncome = transactions.where((t) => t.type == TransactionType.income).fold(0.0, (sum, item) => sum + item.amount);
     final balance = totalIncome - totalSpent;
@@ -117,12 +120,12 @@ class DashboardScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildBalanceCard(context, balance),
+          _buildBalanceCard(context, l10n, balance),
           const SizedBox(height: 24),
-          _buildQuickActionsRow(context, ref),
+          _buildQuickActionsRow(context, ref, l10n),
           const SizedBox(height: 32),
           Text(
-            'LATEST ACTIVITY',
+            l10n.translate('dash_latest_activity'),
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w900,
@@ -132,17 +135,17 @@ class DashboardScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 16),
           if (transactions.isEmpty)
-            _buildEmptyState(context)
+            _buildEmptyState(context, l10n)
           else
             _buildTransactionList(context, transactions),
           const SizedBox(height: 32),
-          _buildInsightsSection(context, ref, transactions),
+          _buildInsightsSection(context, ref, l10n, transactions),
         ],
       ),
     );
   }
 
-  Widget _buildBalanceCard(BuildContext context, double balance) {
+  Widget _buildBalanceCard(BuildContext context, AppLocalizations l10n, double balance) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(28),
@@ -174,7 +177,7 @@ class DashboardScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'ENCRYPTED BALANCE',
+                l10n.translate('dash_encrypted_balance'),
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.5),
                   fontSize: 11,
@@ -206,7 +209,7 @@ class DashboardScreen extends ConsumerWidget {
                     const Icon(Icons.wifi_off_rounded, color: Color(0xFF38B6FF), size: 14),
                     const SizedBox(width: 8),
                     Text(
-                      'LOCAL NODE ACTIVE',
+                      l10n.translate('dash_local_node'),
                       style: TextStyle(
                         color: const Color(0xFF38B6FF).withOpacity(0.8),
                         fontSize: 10,
@@ -224,12 +227,12 @@ class DashboardScreen extends ConsumerWidget {
     ).animate().fadeIn(duration: 800.ms).slideY(begin: 0.1, end: 0);
   }
 
-  Widget _buildQuickActionsRow(BuildContext context, WidgetRef ref) {
+  Widget _buildQuickActionsRow(BuildContext context, WidgetRef ref, AppLocalizations l10n) {
     return Row(
       children: [
-        Expanded(child: _buildSmallActionCard(context, ref, 'BANK SYNC', Icons.account_balance_rounded, true)),
+        Expanded(child: _buildSmallActionCard(context, ref, l10n.translate('dash_bank_sync'), Icons.account_balance_rounded, true)),
         const SizedBox(width: 16),
-        Expanded(child: _buildSmallActionCard(context, ref, 'SMS PARSE', Icons.sms_rounded, false)),
+        Expanded(child: _buildSmallActionCard(context, ref, l10n.translate('dash_sms_parse'), Icons.sms_rounded, false)),
       ],
     );
   }
@@ -293,12 +296,22 @@ class DashboardScreen extends ConsumerWidget {
                ),
              ),
              title: Text(
-               tx.merchant,
-               style: const TextStyle(fontWeight: FontWeight.w700, color: Colors.white, fontSize: 14),
+               tx.merchant.toUpperCase(),
+               style: const TextStyle(
+                 fontWeight: FontWeight.w900, 
+                 color: Colors.white, 
+                 fontSize: 13,
+                 letterSpacing: 1.0,
+               ),
              ),
              subtitle: Text(
-               DateFormat('MMM dd').format(tx.date),
-               style: TextStyle(color: Colors.white.withOpacity(0.4), fontSize: 12),
+               DateFormat('MMM dd').format(tx.date).toUpperCase(),
+               style: TextStyle(
+                 color: Colors.white.withOpacity(0.3), 
+                 fontSize: 10,
+                 fontWeight: FontWeight.w700,
+                 letterSpacing: 0.5,
+               ),
              ),
              trailing: Text(
                '${isExpense ? '-' : '+'}${NumberFormat.currency(symbol: r'$').format(tx.amount)}',
@@ -315,7 +328,7 @@ class DashboardScreen extends ConsumerWidget {
   }
 
 
-  Widget _buildEmptyState(BuildContext context) {
+  Widget _buildEmptyState(BuildContext context, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 40),
@@ -323,9 +336,9 @@ class DashboardScreen extends ConsumerWidget {
           children: [
             Icon(Icons.receipt_outlined, size: 64, color: Colors.grey.shade400),
             const SizedBox(height: 16),
-            Text('No transactions yet', style: TextStyle(color: Colors.grey.shade600)),
+            Text(l10n.translate('dash_no_transactions'), style: TextStyle(color: Colors.grey.shade600)),
             const SizedBox(height: 8),
-            const Text('Add your first transaction manually or wait for SMS sync.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+            Text(l10n.translate('dash_empty_instructions'), textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey)),
           ],
         ),
       ),
@@ -439,7 +452,7 @@ class DashboardScreen extends ConsumerWidget {
     }
   }
 
-  Widget _buildInsightsSection(BuildContext context, WidgetRef ref, List<Transaction> transactions) {
+  Widget _buildInsightsSection(BuildContext context, WidgetRef ref, AppLocalizations l10n, List<Transaction> transactions) {
     final analysis = ref.watch(analysisServiceProvider);
     final insights = analysis.getActionableInsights(transactions);
 
@@ -450,7 +463,7 @@ class DashboardScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Proactive Insights', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(l10n.translate('dash_proactive_insights'), style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
         const SizedBox(height: 12),
         SizedBox(
           height: 160,
@@ -497,7 +510,7 @@ class DashboardScreen extends ConsumerWidget {
                       child: TextButton(
                         onPressed: () {
                           if (insight.actionLabel == 'Review Bills') {
-                            DefaultTabController.of(context).animateTo(2); // Analytics Tab
+                            ref.read(navigationIndexProvider.notifier).state = 2; // Analytics Tab
                           } else {
                             // Show alert details or navigate to transaction
                           }

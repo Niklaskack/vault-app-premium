@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/theme/vault_theme.dart';
@@ -44,6 +45,16 @@ class VaultApp extends ConsumerWidget {
       darkTheme: VaultTheme.dark,
       themeMode: ThemeMode.system,
       debugShowCheckedModeBanner: false,
+      locale: Locale(settings.languageCode),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale('sv'),
+      ],
       home: settings.isLockEnabled ? const LockScreen() : const OnboardingScreen(),
     );
   }

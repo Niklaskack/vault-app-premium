@@ -1,0 +1,121 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../providers/settings_provider.dart';
+
+class AppLocalizations {
+  final Locale locale;
+
+  AppLocalizations(this.locale);
+
+  static final Map<String, Map<String, String>> _localizedValues = {
+    'en': {
+      'app_title': 'V A U L T',
+      'nav_dashboard': 'DASHBOARD',
+      'nav_analytics': 'INTELLIGENCE',
+      'nav_transactions': 'LEDGER',
+      'nav_profile': 'COMMAND',
+      'profile_identity': 'IDENTITY & ACCOUNT',
+      'profile_legal_identity': 'LEGAL IDENTITY',
+      'profile_elite_member': 'VAULT ELITE MEMBER',
+      'profile_governance_email': 'GOVERNANCE EMAIL',
+      'profile_shielded_email': 'SHIELDED via VAULT PROTOCOL',
+      'profile_security': 'SECURITY & ACCESS',
+      'profile_privacy_dashboard': 'PRIVACY DASHBOARD',
+      'profile_zero_knowledge': 'Zero-knowledge governance',
+      'profile_app_lock': 'APP LOCK',
+      'profile_biometric': 'Biometric authorization required',
+      'profile_system': 'SYSTEM',
+      'profile_export_data': 'EXPORT DATA',
+      'profile_download_json': 'Download encrypted JSON',
+      'profile_about': 'ABOUT VAULT',
+      'profile_version': 'Version 2.4.0 • Enterprise SDK',
+      'profile_language': 'LANGUAGE',
+      'profile_current_lang': 'ENGLISH',
+      'profile_session_encrypted': 'VAULT SECURE CORE • SESSION ENCRYPTED',
+      'analytics_neural_forecast': 'NEURAL CASH FLOW',
+      'analytics_safe_to_spend': 'SAFE-TO-SPEND',
+      'analytics_category_allocation': 'CATEGORY ALLOCATION',
+      'analytics_recurring': 'RECURRING SUBSCRIPTIONS',
+      'negotiate_script': 'INTELLIGENCE SCRIPT',
+      'negotiate_blueprint': 'NEGOTIATION BLUEPRINTS',
+      'ledger_title': 'L E D G E R',
+      'dash_latest_activity': 'LATEST ACTIVITY',
+      'dash_encrypted_balance': 'ENCRYPTED BALANCE',
+      'dash_local_node': 'LOCAL NODE ACTIVE',
+      'dash_bank_sync': 'BANK SYNC',
+      'dash_sms_parse': 'SMS PARSE',
+      'dash_no_transactions': 'No transactions yet',
+      'dash_empty_instructions': 'Add your first transaction manually or wait for SMS sync.',
+      'dash_proactive_insights': 'Proactive Insights',
+      'dash_sync_error': 'Sync Error',
+      'analytics_net_burn': 'NET BURN',
+      'analytics_negotiate': 'NEGOTIATE',
+      'analytics_ai_detected': 'AI DETECTED',
+      'analytics_unlock_forecast': 'UNLOCK NEURAL FORECAST',
+      'analytics_engine_standby': 'ENGINE STANDBY',
+      'analytics_engine_standby_msg': 'Awaiting transaction ingestion for analysis.',
+      'analytics_cycle_detected': 'MONTHLY CYCLE DETECTED',
+      'analytics_no_cycles': 'No repeating cycles detected yet.',
+      'analytics_train_engine': 'Keep using Vault to train the engine.',
+    },
+    'sv': {
+      'app_title': 'V A U L T',
+      'nav_dashboard': 'ÖVERSIKT',
+      'nav_analytics': 'INTELLIGENS',
+      'nav_transactions': 'LIGGARE',
+      'nav_profile': 'KONTROLL',
+      'profile_identity': 'IDENTITET & KONTO',
+      'profile_legal_identity': 'JURIDISK IDENTITET',
+      'profile_elite_member': 'VAULT ELITE-MEDLEM',
+      'profile_governance_email': 'ADMINISTRATIONS-E-POST',
+      'profile_shielded_email': 'SKYDDAD via VAULT-PROTOKOLL',
+      'profile_security': 'SÄKERHET & ÅTKOMST',
+      'profile_privacy_dashboard': 'INTEGRITETSPANEL',
+      'profile_zero_knowledge': 'Zero-knowledge styrning',
+      'profile_app_lock': 'APPLÅS',
+      'profile_biometric': 'Biometrisk auktorisering krävs',
+      'profile_system': 'SYSTEM',
+      'profile_export_data': 'EXPORTERA DATA',
+      'profile_download_json': 'Ladda ner krypterad JSON',
+      'profile_about': 'OM VAULT',
+      'profile_version': 'Version 2.4.0 • Enterprise SDK',
+      'profile_language': 'SPRÅK',
+      'profile_current_lang': 'SVENSKA',
+      'profile_session_encrypted': 'VAULT SÄKER KÄRNA • SESSION KRYPTERAD',
+      'analytics_neural_forecast': 'NEURALT KASSAFLÖDE',
+      'analytics_safe_to_spend': 'TILLGÄNGLIGT ATT SPENDERA',
+      'analytics_category_allocation': 'KATEGORIALLOKERING',
+      'analytics_recurring': 'ÅTERKOMMANDE PRENUMERATIONER',
+      'negotiate_script': 'INTELLIGENSMANUS',
+      'negotiate_blueprint': 'FÖRHANDLINGSPLANER',
+      'ledger_title': 'L I G G A R E',
+      'dash_latest_activity': 'SENASTE AKTIVITET',
+      'dash_encrypted_balance': 'KRYPTERAT SALDO',
+      'dash_local_node': 'LOKAL NOD AKTIV',
+      'dash_bank_sync': 'BANK-SYNK',
+      'dash_sms_parse': 'SMS-TOLKNING',
+      'dash_no_transactions': 'Inga transaktioner än',
+      'dash_empty_instructions': 'Lägg till din första transaktion manuellt eller vänta på SMS-synkronisering.',
+      'dash_proactive_insights': 'Proaktiva insikter',
+      'dash_sync_error': 'Synkroniseringsfel',
+      'analytics_net_burn': 'NETTOFÖRBRUKNING',
+      'analytics_negotiate': 'FÖRHANDLA',
+      'analytics_ai_detected': 'AI-IDENTIFIERAD',
+      'analytics_unlock_forecast': 'LÅS UPP NEURAL PROGNOS',
+      'analytics_engine_standby': 'MOTOR I STANDBY',
+      'analytics_engine_standby_msg': 'Väntar på transaktionsinmatning för analys.',
+      'analytics_cycle_detected': 'MÅNATLIG CYKEL IDENTIFIERAD',
+      'analytics_no_cycles': 'Inga återkommande cykler identifierade än.',
+      'analytics_train_engine': 'Fortsätt använda Vault för att träna motorn.',
+    },
+  };
+
+  String translate(String key) {
+    return _localizedValues[locale.languageCode]?[key] ?? key;
+  }
+}
+
+final l10nProvider = Provider((ref) {
+  final settings = ref.watch(appSettingsProvider);
+  return AppLocalizations(Locale(settings.languageCode));
+});
